@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>С Новым Годом, Любимая!</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- 1. Основные стили (CSS) --- */
+        :root {
+            --primary-pink: #ffb7c5;
+            --dark-pink: #ff69b4;
+            --text-color: #5a2a3b;
+            --white: #ffffff;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(180deg, #fff0f5 0%, #ffc0cb 100%);
+            color: var(--text-color);
+            overflow-x: hidden;
+            /* Убираем скролл, если показана только кнопка */
+            overflow-y: hidden; 
+        }
+
+        /* Общий контейнер для падающих объектов */
+        .heart-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        /* Стиль падающего элемента */
+        .falling-item {
+            position: absolute;
+            top: -50px;
+            pointer-events: none;
+            animation: fall linear infinite;
+            white-space: nowrap; /* Важно для эмодзи */
+        }
+
+        /* Если падает картинка */
+        .falling-item img {
+            width: 63px; /* Размер падающих фото */
+            height: 63px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Стили для падающих эмодзи (для обычного фона и сюрприза) */
+        .falling-item.emoji {
+            font-size: 20px; /* Базовый размер для эмодзи */
+            color: rgba(255, 105, 180, 0.6);
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+        }
+
+
+        @keyframes fall {
+            0% { 
+                transform: translateY(-10vh) rotate(var(--start-angle)); 
+                opacity: 1; 
+            }
+            100% { 
+                transform: translateY(110vh) rotate(var(--end-angle)); 
+                opacity: 0; 
+            }
+        }
+
+        /* --- Стили для первого экрана с кнопкой --- */
+        #initial-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white; /* Чисто белый фон */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100; /* Поверх всего */
+            transition: opacity 1.5s ease-out; /* Анимация исчезновения */
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        #initial-screen.hidden {
+            opacity: 0;
+            pointer-events: none; /* Чтобы нельзя было нажать после скрытия */
+        }
+
+        #surprise-button {
+            background: #ff1493; /* Ярко-розовый */
+            color: white;
+            border: none;
+            padding: 20px 60px;
+            font-size: 2.2rem; /* Крупнее, чтобы было заметно */
+            font-family: 'Pacifico', cursive;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(255, 20, 147, 0.4);
+            transition: transform 0.3s, background 0.3s;
+            animation: pulse 1.5s infinite; /* Пульсирующая анимация */
+        }
+
+        #surprise-button:hover {
+            transform: scale(1.05);
+            background: #e6007e;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 8px 20px rgba(255, 20, 147, 0.4); }
+            50% { transform: scale(1.02); box-shadow: 0 12px 25px rgba(255, 20, 147, 0.6); }
+            100% { transform: scale(1); box-shadow: 0 8px 20px rgba(255, 20, 147, 0.4); }
+        }
+
+        #initial-screen p {
+            font-family: 'Nunito', sans-serif;
+            font-size: 1.5rem;
+            color: #5a2a3b;
+            text-align: center;
+            max-width: 80%;
+        }
+
+        /* --- Стили для основного контента (он будет изначально скрыт) --- */
+        #main-content {
+            opacity: 0;
+            transition: opacity 2s ease-in; /* Плавное появление */
+            /* Чтобы контент не был кликабелен до появления */
+            pointer-events: none; 
+        }
+        #main-content.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        /* Контейнер для контента */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 0 40px;
+            animation: fadeInDown 1.5s ease;
+        }
+
+        h1 {
+            font-family: 'Pacifico', cursive;
+            font-size: 3.2rem;
+            color: var(--dark-pink);
+            text-shadow: 2px 2px 0px #fff;
+            margin: 0;
+        }
+
+        p.subtitle {
+            font-size: 1.2rem;
+            margin-top: 10px;
+            color: #884455;
+        }
+
+        .divider {
+            font-size: 6rem;
+            text-align: center;
+            margin: 20px 0;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(-5deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+        }
+
+        .memory-card {
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(255, 105, 180, 0.2);
+            margin-bottom: 50px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+            border: 2px solid #fff;
+        }
+        
+        .memory-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (min-width: 600px) {
+            .memory-card {
+                flex-direction: row;
+                gap: 30px;
+            }
+            .memory-card:nth-child(even) {
+                flex-direction: row-reverse;
+            }
+        }
+
+        .photo-frame {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            flex-shrink: 0;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 5px solid var(--primary-pink);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: rotate(-3deg);
+            margin-bottom: 15px;
+        }
+        
+        .memory-card:nth-child(even) .photo-frame {
+            transform: rotate(3deg);
+        }
+
+        .photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .text-frame {
+            background-color: #fff0f6;
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px dashed var(--dark-pink);
+            position: relative;
+            flex-grow: 1;
+        }
+
+        .text-frame::before {
+            content: '❤';
+            position: absolute;
+            top: -15px;
+            right: -10px;
+            font-size: 30px;
+            color: var(--dark-pink);
+            background: white;
+            border-radius: 50%;
+            padding: 0 5px;
+        }
+
+        .text-frame h3 {
+            font-family: 'Pacifico', cursive;
+            color: var(--dark-pink);
+            margin-top: 0;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 0 20px;
+            color: #884455;
+        }
+
+        .main-footer-text {
+            font-size: 1rem;
+            margin-bottom: 25px;
+        }
+
+        .copyright {
+            font-size: 0.65rem;
+            opacity: 0.7;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-top: 1px solid rgba(136, 68, 85, 0.2);
+            padding-top: 15px;
+            margin-top: 20px;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="heart-bg" id="heartBg"></div>
+
+    <div id="initial-screen">
+        <button id="surprise-button" onclick="startSurpriseSequence()">Нажми на меня! ✨</button>
+    </div>
+
+    <div id="main-content">
+        <div class="container">
+            <header>
+                <h1>С Новым Годом, ЛЮБИМАЯЯ!🎄</h1>
+                <p class="subtitle">Для моей единственной и самой дорогой девочки❤️❤️❤️❤️❤️</p>
+                <p class="subtitle">Это наш только второй Новый год вместе, сколько всего прошло, а сколько ещё впереди....</p>
+            </header>
+
+            <div class="memory-card">
+                <div class="photo-frame">
+                    <img src="images/1.1.jpg" alt="Мы вместе">
+                </div>
+                <div class="text-frame">
+                    <h3>Наше начало. "Лучшая пара forever"</h3>
+                    <p>Помнишь этот день? Я хочу, чтобы в Новом году у нас было еще больше таких тёплых моментов. Ты делаешь меня счастливым каждый день без исключения.</p>
+                </div>
+            </div>
+
+            <div class="divider">🎄</div>
+
+            <div class="memory-card">
+                <div class="photo-frame">
+                    <img src="images/1.2.jpg" alt="Смешной момент">
+                </div>
+                <div class="text-frame">
+                    <h3>Твоя улыбка :)</h3>
+                    <p>В этом году я обещаю ещё чаще заставлять тебя улыбаться). Ведь Твоя улыбка — это самый лучший подарок на любой праздник.</p>
+                </div>
+            </div>
+
+            <div class="divider">☃️</div>
+
+            <div class="memory-card">
+                <div class="photo-frame">
+                    <img src="images/1.3.jpg" alt="Путешествие">
+                </div>
+                <div class="text-frame">
+                    <h3>Мечты всегда сбываются</h3>
+                    <p>Пусть Новый год принесет нам исполнение наших общих желаний, пусть в этом году нас не встретят проблемы и переживания, пусть 26 год будет ещё более солнечным и счастливым. Я безумно люблю тебя и хочу сказать спасибо за этот год!</p>
+                </div>
+            </div>
+
+            <footer>
+                <div class="main-footer-text">
+                    Ты — моё главное чудо ✨<br>
+                    2025 → 2026
+                </div>
+                
+                <div class="copyright">
+                    © ALESHKINO CORPORATION 2007-now.<br>
+                    ВСЕ ПРАВА ЗАЩИЩЕНЫ МНОЙ)))
+                </div>
+            </footer>
+        </div>
+    </div> <script>
+    // --- СПИСОК ТВОИХ КАРТИНОК ДЛЯ ПАДЕНИЯ ---
+    // Добавь сюда свои названия файлов из папки falling_images
+    const customImages = [
+        'falling_images/1.jpg', 
+        'falling_images/2.jpg',
+        'falling_images/3.jpg',
+        'falling_images/4.jpg',
+        'falling_images/5.jpg',
+        'falling_images/6.jpg',
+        'falling_images/7.jpg',
+        'falling_images/8.jpg',
+        'falling_images/9.jpg',
+        'falling_images/10.jpg',
+        'falling_images/11.jpg',
+        'falling_images/12.jpg',
+        'falling_images/13.jpg',
+        'falling_images/14.jpg',
+        'falling_images/15.jpg',
+        'falling_images/16.jpg',
+        'falling_images/17.jpg',
+        'falling_images/18.jpg',
+        'falling_images/19.jpg',
+        'falling_images/20.jpg',
+        'falling_images/21.jpg',
+        'falling_images/22.jpg',
+        'falling_images/23.jpg',
+        'falling_images/24.jpg',
+        'falling_images/25.jpg',
+        'falling_images/26.jpg',
+        'falling_images/27.jpg',
+        'falling_images/28.jpg',
+        'falling_images/29.jpg',
+        'falling_images/30.jpg',
+        'falling_images/31.jpg',
+        'falling_images/32.jpg',
+        'falling_images/33.jpg',
+        'falling_images/34.jpg',
+        'falling_images/35.jpg',
+        'falling_images/36.jpg',
+        'falling_images/37.jpg',
+        'falling_images/38.jpg',
+        'falling_images/39.jpg',
+        'falling_images/40.jpg',
+        'falling_images/41.jpg',
+        'falling_images/42.jpg',
+        'falling_images/43.jpg',
+        'falling_images/44.jpg',
+        'falling_images/45.jpg',
+        'falling_images/46.jpg',
+        'falling_images/47.jpg',
+    ];
+
+    const icons = ['❤', '💖', '❄️', '✨', '💕', '🥰', '🌟', '💝']; // Добавил больше эмодзи
+
+    // Функция для создания одного падающего объекта
+    function createFallingObject(isSurprise = false, isRegularEmoji = true) {
+        const container = document.getElementById('heartBg');
+        const item = document.createElement('div');
+        item.classList.add('falling-item');
+        
+        let typeChoice;
+        if (isSurprise) { // Для сюрприза только эмодзи
+            typeChoice = 'emoji';
+        } else { // Для обычного фона
+            typeChoice = (Math.random() < 0.3 && customImages.length > 0) ? 'image' : 'emoji';
+        }
+
+        if (typeChoice === 'image') {
+            const img = document.createElement('img');
+            img.src = customImages[Math.floor(Math.random() * customImages.length)];
+            item.appendChild(img);
+        } else { // Эмодзи
+            item.innerText = icons[Math.floor(Math.random() * icons.length)];
+            item.classList.add('emoji');
+            // Размеры эмодзи: для сюрприза крупнее и больше разброс
+            item.style.fontSize = (isSurprise ? Math.random() * 40 + 40 : Math.random() * 20 + 30) + "px";
+            item.style.color = isSurprise ? `rgba(255, 20, 147, ${Math.random() * 0.4 + 0.6})` : `rgba(255, 105, 180, ${Math.random() * 0.5 + 0.3})`;
+            // Убираем тень у обычных эмодзи, тень только для падающих фото
+            if (!isSurprise) item.style.filter = 'none'; 
+        }
+        
+        item.style.left = Math.random() * 100 + "vw";
+        item.style.setProperty('--start-angle', (Math.random() * 180 - 90) + "deg"); // От -90 до 90
+        item.style.setProperty('--end-angle', (Math.random() * 720 - 360) + "deg"); // От -360 до 360 для активного вращения
+        
+        const duration = isSurprise ? (Math.random() * 2 + 3) : (Math.random() * 4 + 8); // Сюрприз падает быстрее
+        item.style.animationDuration = duration + "s";
+        
+        container.appendChild(item);
+
+        setTimeout(() => {
+            item.remove();
+        }, duration * 1000);
+    }
+
+    let regularFallingInterval;
+
+    // Функция запускает последовательность сюрприза и показа основного контента
+    function startSurpriseSequence() {
+        // Останавливаем обычное падение на время сюрприза
+        clearInterval(regularFallingInterval); 
+        
+        // Отключаем возможность повторно нажать
+        document.getElementById('surprise-button').disabled = true;
+        document.getElementById('surprise-button').innerText = 'Загрузка...';
+
+        // Запускаем мощный залп сердец
+        for(let i = 0; i < 70; i++) { // Увеличил количество сердец
+            setTimeout(() => createFallingObject(true), i * 30); // Чаще и быстрее
+        }
+
+        // Через несколько секунд (после залпа) скрываем первый экран и показываем основной контент
+        setTimeout(() => {
+            document.getElementById('initial-screen').classList.add('hidden');
+            document.getElementById('main-content').classList.add('visible');
+            document.body.style.overflowY = 'auto'; // Включаем скролл для основного контента
+
+            // Возобновляем обычное падение после появления основного контента
+            startRegularFalling();
+
+            // Запускаем анимацию появления карточек (если пользователь уже прокрутил вниз)
+            // или ждем, пока он начнет скроллить
+            const cards = document.querySelectorAll('.memory-card');
+            cards.forEach(card => observer.observe(card));
+
+        }, 3000); // 3 секунды задержки
+    }
+
+    // Запускаем обычное падение (картинки + эмодзи)
+    function startRegularFalling() {
+        regularFallingInterval = setInterval(() => createFallingObject(false), 350);
+    }
+
+    // Скрипт появления блоков при прокрутке
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target); // Остановить наблюдение после появления
+            }
+        });
+    }, { threshold: 0.1 });
+
+    // Изначально запускаем фоновое падение, но только эмодзи, чтобы не грузить картинки до показа
+    // setInterval(() => createFallingObject(false, true), 350); // Отключаем это, т.к. фон белый
+
+    // Инициализация - запускать обычное падение начнем после сюрприза
+    // Сразу после загрузки страницы никаких падающих элементов нет, пока не нажмут кнопку.
+    </script>
+</body>
+</html>
